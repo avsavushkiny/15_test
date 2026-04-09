@@ -1,5 +1,3 @@
-# Simple C++ CI with Windows Support
-
 name: Simple C++ CI
 
 on: [push, pull_request]
@@ -11,38 +9,55 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Install MinGW via Chocolatey
+    - name: Install MinGW
       run: |
-        choco install mingw -y
-        refreshenv
+        choco install mingw -y --force
+        echo "C:\ProgramData\chocolatey\lib\mingw\tools\mingw64\bin" >> $env:GITHUB_PATH
     
-    - name: Build project
+    - name: Verify g++ installation
+      run: g++ --version
+    
+    - name: Create build directory
+      run: mkdir build -Force
+    
+    - name: Build main program
       run: |
-        g++ -std=c++17 -Wall -Wextra src/calculator.cpp src/main.cpp -o build\\app.exe
-        echo "Build successful"
+        g++ -std=c++17 -Wall -Wextra src/calculator.cpp src/main.cpp -o build/app.exe
+        if (Test-Path build/app.exe) {
+          echo "Build successful"
+        } else {
+          echo "❌ Build failed"
+          exit 1
+        }
     
     - name: Run main program
       run: |
-        build\\app.exe
+        build/app.exe
         echo "Program executed successfully"
+    
+    - name: Build tests
+      run: |
+        g++ -std=c++17 -Wall -Wextra src/calculator.cpp tests/test_calculator.cpp -o build/tests.exe
+        echo "Tests build successful"
     
     - name: Run tests
       run: |
-        g++ -std=c++17 -Wall -Wextra src/calculator.cpp tests/test_calculator.cpp -o tests.exe
-        .\\tests.exe
+        build/tests.exe
         echo "Tests passed"
     
-    - name: Check compilation warnings
+    - name: Check compilation warnings as errors
       run: |
-        g++ -std=c++17 -Wall -Wextra -Werror src/calculator.cpp src/main.cpp -o app_check.exe
+        g++ -std=c++17 -Wall -Wextra -Werror src/calculator.cpp src/main.cpp -o build/app_check.exe
         echo "No warnings"
     
     - name: Verify output
+      shell: pwsh
       run: |
-        $OUTPUT = (.uild\app.exe)
+        $OUTPUT = & ./build/app.exe
         if ($OUTPUT -match "Sum of 10 \+ 20 = 30") {
           echo "Output verification passed"
         } else {
-          echo "Output verification failed"
+          echo "❌ Output verification failed"
+          echo "Actual output: $OUTPUT"
           exit 1
         }
