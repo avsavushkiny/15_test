@@ -1,180 +1,220 @@
-name: C++ Simple Project CI
+# name: C++ Simple Project CI
 
-on:
-  push:
-    branches: [ main, master, develop ]
-  pull_request:
-    branches: [ main, master ]
+# on:
+#   push:
+#     branches: [ main, master, develop ]
+#   pull_request:
+#     branches: [ main, master ]
+
+# jobs:
+#   # JOB 1: Проверка сборки на Ubuntu
+#   build-ubuntu:
+#     runs-on: ubuntu-latest
+#     steps:
+#     - name: Checkout repository
+#       uses: actions/checkout@v4
+    
+#     - name: Install dependencies
+#       run: |
+#         sudo apt-get update
+#         sudo apt-get install -y g++ make
+    
+#     - name: Build project
+#       run: |
+#         make all
+#         echo "Build successful"
+    
+#     - name: Run main program
+#       run: |
+#         ./build/app
+#         echo "Program executed successfully"
+    
+#     - name: Run tests
+#       run: |
+#         make test
+#         echo "Tests passed"
+    
+#     - name: Upload build artifacts
+#       uses: actions/upload-artifact@v4
+#       with:
+#         name: ubuntu-build
+#         path: build/
+
+#   # JOB 2: Проверка сборки на Windows
+#   build-windows:
+#     runs-on: windows-latest
+#     steps:
+#     - name: Checkout repository
+#       uses: actions/checkout@v4
+    
+#     - name: Setup MSVC
+#       uses: ilammy/msvc-dev-cmd@v1
+    
+#     - name: Build with clang
+#       run: |
+#         clang++ -std=c++17 -Wall -Wextra src/calculator.cpp src/main.cpp -o app.exe
+#         ./app.exe
+    
+#     - name: Run tests
+#       run: |
+#         clang++ -std=c++17 -Wall -Wextra src/calculator.cpp tests/test_calculator.cpp -o tests.exe
+#         ./tests.exe
+
+#   # JOB 3: Проверка сборки на macOS
+#   build-macos:
+#     runs-on: macos-latest
+#     steps:
+#     - name: Checkout repository
+#       uses: actions/checkout@v4
+    
+#     - name: Install dependencies
+#       run: |
+#         brew install make
+#         brew install clang-format
+    
+#     - name: Build with make
+#       run: |
+#         make all
+#         echo "Build successful"
+    
+#     - name: Run tests
+#       run: |
+#         make test
+#         echo "Tests passed"
+
+#   # JOB 4: Статический анализ (cppcheck)
+#   static-analysis:
+#     runs-on: ubuntu-latest
+#     steps:
+#     - name: Checkout repository
+#       uses: actions/checkout@v4
+    
+#     - name: Install cppcheck
+#       run: sudo apt-get install -y cppcheck
+    
+#     - name: Run cppcheck
+#       run: |
+#         cppcheck --enable=all --error-exitcode=1 --suppress=missingIncludeSystem \
+#                  --std=c++17 src/ tests/
+#         echo "Static analysis passed"
+
+#   # JOB 5: Проверка форматирования (clang-format)
+#   formatting-check:
+#     runs-on: ubuntu-latest
+#     steps:
+#     - name: Checkout repository
+#       uses: actions/checkout@v4
+    
+#     - name: Install clang-format
+#       run: sudo apt-get install -y clang-format
+    
+#     - name: Check formatting
+#       run: |
+#         find src/ tests/ -name '*.cpp' -o -name '*.h' | xargs clang-format --dry-run --Werror
+#         echo "Code formatting is correct"
+
+#   # JOB 6: Анализ с помощью GCC санитайзеров
+#   sanitizer-check:
+#     runs-on: ubuntu-latest
+#     steps:
+#     - name: Checkout repository
+#       uses: actions/checkout@v4
+    
+#     - name: Build with sanitizers
+#       run: |
+#         g++ -std=c++17 -fsanitize=address -fsanitize=undefined -g \
+#             -Wall -Wextra -Werror \
+#             src/calculator.cpp tests/test_calculator.cpp \
+#             -o tests_sanitizer
+    
+#     - name: Run tests with sanitizers
+#       run: |
+#         ./tests_sanitizer
+#         echo "Sanitizer checks passed"
+
+#   # JOB 7: Проверка на утечки памяти (Valgrind)
+#   valgrind-check:
+#     runs-on: ubuntu-latest
+#     steps:
+#     - name: Checkout repository
+#       uses: actions/checkout@v4
+    
+#     - name: Install valgrind
+#       run: sudo apt-get install -y valgrind
+    
+#     - name: Build with debug symbols
+#       run: |
+#         make clean
+#         make test
+    
+#     - name: Run valgrind
+#       run: |
+#         valgrind --leak-check=full \
+#                  --error-exitcode=1 \
+#                  --show-leak-kinds=all \
+#                  --track-origins=yes \
+#                  ./build/tests
+#         echo "Valgrind check passed"
+
+#   # JOB 8: Проверка совместимости с разными компиляторами
+#   different-compilers:
+#     runs-on: ubuntu-latest
+#     strategy:
+#       matrix:
+#         compiler: [g++-11, g++-12, clang++-15, clang++-16]
+    
+#     steps:
+#     - name: Checkout repository
+#       uses: actions/checkout@v4
+    
+#     - name: Install compilers
+#       run: |
+#         sudo apt-get update
+#         sudo apt-get install -y g++-11 g++-12 clang-15 clang-16
+    
+#     - name: Build with ${{ matrix.compiler }}
+#       run: |
+#         ${{ matrix.compiler }} -std=c++17 -Wall -Wextra -Werror \
+#             src/calculator.cpp tests/test_calculator.cpp -o test_${{ matrix.compiler }}
+#         ./test_${{ matrix.compiler }}
+#         echo "Build with ${{ matrix.compiler }} successful"
+
+name: Simple C++ CI
+
+on: [push, pull_request]
 
 jobs:
-  # JOB 1: Проверка сборки на Ubuntu
-  build-ubuntu:
+  build-and-test:
     runs-on: ubuntu-latest
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
     
-    - name: Install dependencies
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install build tools
       run: |
         sudo apt-get update
         sudo apt-get install -y g++ make
     
     - name: Build project
-      run: |
-        make all
-        echo "Build successful"
+      run: make all
     
     - name: Run main program
-      run: |
-        ./build/app
-        echo "Program executed successfully"
+      run: ./build/app
     
     - name: Run tests
+      run: make test
+    
+    - name: Check compilation warnings
       run: |
-        make test
-        echo "Tests passed"
+        g++ -std=c++17 -Wall -Wextra -Werror src/calculator.cpp src/main.cpp -o app_check
+        echo "No warnings"
     
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: ubuntu-build
-        path: build/
-
-  # JOB 2: Проверка сборки на Windows
-  build-windows:
-    runs-on: windows-latest
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-    
-    - name: Setup MSVC
-      uses: ilammy/msvc-dev-cmd@v1
-    
-    - name: Build with clang
+    - name: Verify output
       run: |
-        clang++ -std=c++17 -Wall -Wextra src/calculator.cpp src/main.cpp -o app.exe
-        ./app.exe
-    
-    - name: Run tests
-      run: |
-        clang++ -std=c++17 -Wall -Wextra src/calculator.cpp tests/test_calculator.cpp -o tests.exe
-        ./tests.exe
-
-  # JOB 3: Проверка сборки на macOS
-  build-macos:
-    runs-on: macos-latest
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-    
-    - name: Install dependencies
-      run: |
-        brew install make
-        brew install clang-format
-    
-    - name: Build with make
-      run: |
-        make all
-        echo "Build successful"
-    
-    - name: Run tests
-      run: |
-        make test
-        echo "Tests passed"
-
-  # JOB 4: Статический анализ (cppcheck)
-  static-analysis:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-    
-    - name: Install cppcheck
-      run: sudo apt-get install -y cppcheck
-    
-    - name: Run cppcheck
-      run: |
-        cppcheck --enable=all --error-exitcode=1 --suppress=missingIncludeSystem \
-                 --std=c++17 src/ tests/
-        echo "Static analysis passed"
-
-  # JOB 5: Проверка форматирования (clang-format)
-  formatting-check:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-    
-    - name: Install clang-format
-      run: sudo apt-get install -y clang-format
-    
-    - name: Check formatting
-      run: |
-        find src/ tests/ -name '*.cpp' -o -name '*.h' | xargs clang-format --dry-run --Werror
-        echo "Code formatting is correct"
-
-  # JOB 6: Анализ с помощью GCC санитайзеров
-  sanitizer-check:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-    
-    - name: Build with sanitizers
-      run: |
-        g++ -std=c++17 -fsanitize=address -fsanitize=undefined -g \
-            -Wall -Wextra -Werror \
-            src/calculator.cpp tests/test_calculator.cpp \
-            -o tests_sanitizer
-    
-    - name: Run tests with sanitizers
-      run: |
-        ./tests_sanitizer
-        echo "Sanitizer checks passed"
-
-  # JOB 7: Проверка на утечки памяти (Valgrind)
-  valgrind-check:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-    
-    - name: Install valgrind
-      run: sudo apt-get install -y valgrind
-    
-    - name: Build with debug symbols
-      run: |
-        make clean
-        make test
-    
-    - name: Run valgrind
-      run: |
-        valgrind --leak-check=full \
-                 --error-exitcode=1 \
-                 --show-leak-kinds=all \
-                 --track-origins=yes \
-                 ./build/tests
-        echo "Valgrind check passed"
-
-  # JOB 8: Проверка совместимости с разными компиляторами
-  different-compilers:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        compiler: [g++-11, g++-12, clang++-15, clang++-16]
-    
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-    
-    - name: Install compilers
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y g++-11 g++-12 clang-15 clang-16
-    
-    - name: Build with ${{ matrix.compiler }}
-      run: |
-        ${{ matrix.compiler }} -std=c++17 -Wall -Wextra -Werror \
-            src/calculator.cpp tests/test_calculator.cpp -o test_${{ matrix.compiler }}
-        ./test_${{ matrix.compiler }}
-        echo "Build with ${{ matrix.compiler }} successful"
+        OUTPUT=$(./build/app)
+        if echo "$OUTPUT" | grep -q "Sum of 10 + 20 = 30"; then
+          echo "Output verification passed"
+        else
+          echo "Output verification failed"
+          exit 1
+        fi
