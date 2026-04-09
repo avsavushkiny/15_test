@@ -2,7 +2,8 @@
 #include <iostream>
 #include <cassert>
 
-void testAdd() {
+void testAdd()
+{
     std::cout << "Running testAdd... ";
     assert(add(2, 3) == 5);
     assert(add(-1, 1) == 0);
@@ -11,41 +12,53 @@ void testAdd() {
     std::cout << "PASSED" << std::endl;
 }
 
-void testAddWithCheck() {
+void testAddWithCheck()
+{
     std::cout << "Running testAddWithCheck... ";
     assert(addWithCheck(10, 20) == 30);
     assert(addWithCheck(-10, -20) == -30);
-    
+
     // Тест на переполнение
-    try {
+    try
+    {
         addWithCheck(INT_MAX, 1);
         assert(false); // Должно быть исключение
-    } catch (const std::overflow_error&) {
+    }
+    catch (const std::overflow_error &)
+    {
         // Ожидаемое исключение
     }
-    
-    try {
+
+    try
+    {
         addWithCheck(INT_MIN, -1);
         assert(false); // Должно быть исключение
-    } catch (const std::overflow_error&) {
+    }
+    catch (const std::overflow_error &)
+    {
         // Ожидаемое исключение
     }
     std::cout << "PASSED" << std::endl;
 }
 
-void testPrintMessage() {
+void testPrintMessage()
+{
     std::cout << "Running testPrintMessage... ";
     // Просто проверяем, что функция не выбрасывает исключений
-    try {
+    try
+    {
         printMessage("Test message");
         std::cout << "PASSED" << std::endl;
-    } catch (...) {
+    }
+    catch (...)
+    {
         std::cout << "FAILED" << std::endl;
         assert(false);
     }
 }
 
-int main() {
+int main()
+{
     std::cout << "Running tests..." << std::endl;
     testAdd();
     testAddWithCheck();
