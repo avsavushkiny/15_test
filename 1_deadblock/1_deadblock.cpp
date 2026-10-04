@@ -1,5 +1,3 @@
-//https://clck.ru/3VZAaw
-
 #include <iostream>
 #include <thread>
 #include <mutex>

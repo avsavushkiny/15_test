@@ -1,0 +1,1 @@
+g++ -shared -o mylib.dll mylib.cpp

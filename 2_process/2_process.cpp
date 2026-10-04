@@ -1,4 +1,4 @@
-#include <windows.h>
+#include <windows.h> //https://clck.ru/3Vadr6
 #include <stdio.h>
 
 int main()
